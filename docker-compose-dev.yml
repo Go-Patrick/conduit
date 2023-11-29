@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: turbo-fe:latest
+    container_name: turbo-fe
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      NEXT_PUBLIC_BASE_URL: "http://localhost:3001"
+    ports:
+      - "3000:3000"
+  backend:
+    image: turbo-be:latest
+    container_name: turbo-be
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env

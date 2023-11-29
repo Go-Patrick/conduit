@@ -32,3 +32,10 @@ yarn-error.log*
 
 # turbo
 .turbo
+
+#next
+*.next*
+
+/node_modules
+.env*
+docker-compose-dev.yml

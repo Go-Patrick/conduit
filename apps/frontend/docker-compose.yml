@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: turbo-fe:latest
+    container_name: turbo-fe
+    environment:
+      - NEXT_PUBLIC_BASE_URL=abcdxyz
+    ports:
+      - "3000:3000"

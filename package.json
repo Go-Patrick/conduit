@@ -8,9 +8,11 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "clean": "turbo run clean",
     "dev": "turbo run dev --parallel",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "test": "turbo run test"
   },
   "devDependencies": {
     "eslint-config-custom": "*",
@@ -20,5 +22,9 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "packageManager": "yarn@3.3.1"
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "@angular-devkit/core": "^17.0.3",
+    "@next/font": "^14.0.3"
+  }
 }

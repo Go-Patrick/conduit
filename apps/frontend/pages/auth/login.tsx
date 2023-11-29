@@ -29,6 +29,7 @@ export default function LoginPage() {
             type: "success",
           });
           setJwt(res.data.access_token);
+          console.log(process.env.NEXT_PUBLIC_BASE_URL)
           router.push("/");
         })
         .catch((e) =>
