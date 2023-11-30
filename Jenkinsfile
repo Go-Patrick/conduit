@@ -54,13 +54,15 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
+                            oldTaskDefinition = $(aws ecs --profile demo1 describe-task-definition --task-definition turbo-fe)
+
+                            def content = new groovy.json.JsonSlurperClassic().parseText(oldTaskDefinition)
+                            def taskDef = content.taskDefinition
+                            taskDef.containerDefinitions[0].image = $newImage
+
                             sh '''
-                            aws ecs update-task-definition --task-definition turbo-fe --container-definitions '[
-                                {
-                                  "name": "turbo-fe",
-                                  "image": "$newImage"
-                                }
-                            ]'
+                            aws ecs register-task-definition --family turbo-fe --container-definitions ${taskDef}
+
                             aws ecs update-service --cluster turbo-fe --service turbo-fe --image=${newImage} --force-new-deployment --region ap-southeast-1
                             '''
                         }
