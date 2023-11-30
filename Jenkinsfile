@@ -53,8 +53,14 @@ pipeline {
                 script{
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
-                            sh '''
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
+                            sh '''
+                            aws ecs update-task-definition --task-definition turbo-fe --container-definitions '[
+                                {
+                                  "name": "turbo-fe",
+                                  "image": "$newImage"
+                                }
+                            ]'
                             aws ecs update-service --cluster turbo-fe --service turbo-fe --image=${newImage} --force-new-deployment --region ap-southeast-1
                             '''
                         }
