@@ -55,9 +55,7 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            def oldTaskDefinition = sh '''
-                                aws ecs describe-task-definition --task-definition turbo-fe --output json
-                            '''
+                            def oldTaskDefinition = sh(label: 'Get old task def into', script: "aws ecs describe-task-definition --task-definition turbo-fe --output json")
 
                             def content = new groovy.json.JsonSlurperClassic().parseText(oldTaskDefinition)
                             def taskDef = content.taskDefinition
