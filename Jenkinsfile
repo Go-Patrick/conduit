@@ -58,7 +58,7 @@ pipeline {
                             '''
                         }
                     } catch (Exception e){
-                        echo "Caught exception: ${e}"
+                        echo "Caught exception:  ${e}"
                         currentBuild.result = 'FAILURE'
                     }
                 }
