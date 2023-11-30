@@ -55,7 +55,7 @@ pipeline {
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             sh '''
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            aws ecs update-service --cluster turbo-fe --service turbo-fe --image=${newImage}--force-new-deployment --region ap-southeast-1
+                            aws ecs update-service --cluster turbo-fe --service turbo-fe --image=${newImage} --force-new-deployment --region ap-southeast-1
                             '''
                         }
                     } catch (Exception e){
