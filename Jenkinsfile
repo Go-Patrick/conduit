@@ -19,6 +19,7 @@ pipeline {
             steps {
                 script{
                     checkout scm
+
                 }
             }
         }
