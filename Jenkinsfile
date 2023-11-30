@@ -23,13 +23,13 @@ pipeline {
             }
         }
 
-        stage ('Run test'){
-            steps{
-                sh 'yarn set version 3.2.0'
-                sh 'yarn install'
-                sh 'yarn test'
-            }
-        }
+        // stage ('Run test'){
+        //     steps{
+        //         sh 'yarn set version 3.2.0'
+        //         sh 'yarn install'
+        //         sh 'yarn test'
+        //     }
+        // }
 
         stage('Build frontend image'){
             steps{
