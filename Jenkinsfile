@@ -52,9 +52,8 @@ pipeline {
             steps{
                 script{
                     try{
-                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_CREDENTIALS_ID}"]]){
+                        withAWS(credentialsId: env.AWS_CREDENTIALS_ID) {
                             sh '''
-                            echo Deploy
                             aws ecs update-service --cluster turbo-fe --service turbo-fe --force-new-deployment --region ap-southeast-1
                             '''
                         }
