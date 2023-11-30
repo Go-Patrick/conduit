@@ -25,6 +25,8 @@ pipeline {
 
         stage ('Run test'){
             steps{
+                sh 'npm install --global yarn@3.2.0'
+                sh 'yarn set version 3.2.0'
                 sh 'yarn install'
                 sh 'yarn test'
             }
