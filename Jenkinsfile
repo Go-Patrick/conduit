@@ -36,7 +36,7 @@ pipeline {
                 script{
                     try{
                         docker.withRegistry("https://" + "${env.ECR_URL}/${env.FE_IMAGE_NAME}", 'ecr:ap-southeast-1:patrick-demo-1') {
-                            def FE_IMAGE_NAME="${env.ECR_URL}/${env.FE_IMAGE_NAME}:latest"
+                            def FE_IMAGE_NAME="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
                             def feImage = docker.build("$FE_IMAGE_NAME", "--build-arg NEXT_PUBLIC_BASE_URL=${env.BE_URL} -f apps/frontend/Dockerfile .")
                             feImage.push()
                         }
@@ -54,7 +54,8 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             sh '''
-                            aws ecs update-service --cluster turbo-fe --service turbo-fe --force-new-deployment --region ap-southeast-1
+                            newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
+                            aws ecs update-service --cluster turbo-fe --service turbo-fe --image=${newImage}--force-new-deployment --region ap-southeast-1
                             '''
                         }
                     } catch (Exception e){
