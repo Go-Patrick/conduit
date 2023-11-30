@@ -3,7 +3,7 @@ output "elb" {
 }
 
 output "ecs_target_group" {
-  value = aws_lb_target_group.ecs_fe
+  value = aws_lb_target_group.ecs_be
 }
 
 output "lb_url" {

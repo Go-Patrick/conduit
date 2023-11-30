@@ -10,7 +10,7 @@ resource "aws_lb" "elb" {
   }
 }
 
-resource "aws_lb_target_group" "ecs_fe" {
+resource "aws_lb_target_group" "ecs_be" {
   name     = "turbo-be"
   port     = var.ecs_port
   protocol = "HTTP"
@@ -39,6 +39,6 @@ resource "aws_lb_listener" "http" {
 
   default_action {
     type = "forward"
-    target_group_arn = aws_lb_target_group.ecs_fe.arn
+    target_group_arn = aws_lb_target_group.ecs_be.arn
   }
 }

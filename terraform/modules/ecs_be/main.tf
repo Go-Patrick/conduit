@@ -17,9 +17,9 @@ resource "aws_ecs_task_definition" "dev_to" {
   {
     "portMappings": [
       {
-        "hostPort": 3000,
+        "hostPort": 3001,
         "protocol": "tcp",
-        "containerPort": 3000
+        "containerPort": 3001
       }
     ],
     "cpu": 512,
@@ -82,7 +82,7 @@ resource "aws_ecs_service" "turbo_be" {
   load_balancer {
     target_group_arn = var.ecs_target_group.arn
     container_name = "turbo-be"
-    container_port = 3000
+    container_port = 3001
   }
 }
 
