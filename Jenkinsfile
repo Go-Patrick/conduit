@@ -7,7 +7,7 @@ pipeline {
         FE_IMAGE_NAME="turbo-fe"
         BE_IMAGE_NAME="turbo-be"
         ECR_URL="932782693588.dkr.ecr.ap-southeast-1.amazonaws.com"
-        BE_URL="http://localhost:3001"
+        BE_URL="http://turbo-be-1260018261.ap-southeast-1.elb.amazonaws.com"
     }
 
     tools{
@@ -55,11 +55,16 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            def oldTaskDefinition = sh(label: 'Get old task def into', script: "aws ecs describe-task-definition --task-definition turbo-fe --output json")
+                            def oldTaskDefinition = sh(label: 'Get old task def into', script: "aws ecs describe-task-definition --task-definition turbo-fe --output json", returnStdout: true).trim()
 
-                            def content = new groovy.json.JsonSlurperClassic().parseText(oldTaskDefinition)
-                            def taskDef = content.taskDefinition
-                            taskDef.containerDefinitions[0].image = $newImage
+                            def json = readJSON text: awsOutput
+                            json.taskDefinition.containerDefinitions.each { containerDefinition ->
+                                if (containerDefinition.name == 'turbo-fe') {
+                                    containerDefinition.image = "${newImage}"
+                                }
+                            }
+
+                            def taskDef = writeJSON returnText: true, json: json.taskDefinition
 
                             sh '''
                             aws ecs register-task-definition --family turbo-fe --container-definitions ${taskDef}
