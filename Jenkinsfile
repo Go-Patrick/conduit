@@ -60,7 +60,7 @@ pipeline {
                             def oldTaskDefinition = sh 'aws ecs describe-task-definition --task-definition turbo-fe'
 
                             sh 'echo ${oldTaskDefinition}'
-                            def json = readJSON text: oldTaskDefinition
+                            def json = loadJSONFromString text: oldTaskDefinition
                             json.taskDefinition.containerDefinitions.each { containerDefinition ->
                                 if (containerDefinition.name == 'turbo-fe') {
                                     containerDefinition.image = "${newImage}"
