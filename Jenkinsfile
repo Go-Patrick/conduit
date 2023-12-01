@@ -12,6 +12,8 @@ pipeline {
 
     tools{
         nodejs 'node-20'
+        jdk 'jdk-17'
+        maven 'my-maven'
     }
 
     stages {
@@ -55,7 +57,7 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            def oldTaskDefinition = sh(label: 'Get old task def into', script: "aws ecs describe-task-definition --task-definition turbo-fe --output json", returnStdout: true).trim()
+                            def oldTaskDefinition = sh(label: 'Get old task def into', script: "aws ecs describe-task-definition --task-definition turbo-fe", returnStdout: true).trim()
 
                             def json = readJSON text: oldTaskDefinition
                             json.taskDefinition.containerDefinitions.each { containerDefinition ->
