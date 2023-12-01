@@ -40,4 +40,5 @@ WORKDIR /app
 COPY --from=installer --chown=nestjs:nodejs /app/ .
 
 ENTRYPOINT ["docker-entrypoint.sh"]
+EXPOSE 3001
 CMD [ "node", "apps/backend/dist/main.js" ]

@@ -55,7 +55,13 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            def oldTaskDefinition = sh(label: 'Get old task def into', script: "aws ecs describe-task-definition --task-definition turbo-fe --output json", returnStdout: true).trim()
+                            def taskDefinitionOutput = sh(
+                                label: 'Get old task def into',
+                                script: "aws ecs describe-task-definition --task-definition turbo-fe --output json",
+                                returnStdout: true
+                            )
+
+                            def json = readJSON text: taskDefinitionOutput
 
                             def json = readJSON text: awsOutput
                             json.taskDefinition.containerDefinitions.each { containerDefinition ->
