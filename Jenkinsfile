@@ -61,7 +61,7 @@ pipeline {
 
                             def json = readJSON text: oldTaskDefinition
                             def taskDefinition = json.taskDefinition
-                            taskDefinition.containerDefinitions[0].image = "${newImage}"
+                            taskDefinition.containerDefinitions[0].image = newImage
 
                             echo "Updated Task Definition: ${taskDefinition}"
 
