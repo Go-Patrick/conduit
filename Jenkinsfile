@@ -62,6 +62,27 @@ pipeline {
 
                             def json = readJSON text: oldTaskDefinition
                             def taskDefinition = json.taskDefinition
+
+                            def updatedTaskDefinition = new Map()
+                            updatedTaskDefinition["family"] = taskDefinition["family"]
+                            updatedTaskDefinition["taskRoleArn"] = taskDefinition["taskRoleArn"]
+                            updatedTaskDefinition["executionRoleArn"] = taskDefinition["executionRoleArn"]
+                            updatedTaskDefinition["networkMode"] = taskDefinition["networkMode"]
+                            updatedTaskDefinition["containerDefinitions"] = taskDefinition["containerDefinitions"]
+                            updatedTaskDefinition["volumes"] = taskDefinition["volumes"]
+                            updatedTaskDefinition["placementConstraints"] = taskDefinition["placementConstraints"]
+                            updatedTaskDefinition["requiresCompatibilities"] = taskDefinition["requiresCompatibilities"]
+                            updatedTaskDefinition["cpu"] = taskDefinition["cpu"]
+                            updatedTaskDefinition["memory"] = taskDefinition["memory"]
+                            updatedTaskDefinition["tags"] = taskDefinition["tags"]
+                            updatedTaskDefinition["pidMode"] = taskDefinition["pidMode"]
+                            updatedTaskDefinition["ipcMode"] = taskDefinition["ipcMode"]
+                            updatedTaskDefinition["proxyConfiguration"] = taskDefinition["proxyConfiguration"]
+                            updatedTaskDefinition["inferenceAccelerators"] = taskDefinition["inferenceAccelerators"]
+                            updatedTaskDefinition["ephemeralStorage"] = taskDefinition["ephemeralStorage"]
+                            updatedTaskDefinition["runtimePlatform"] = taskDefinition["runtimePlatform"]
+
+                            taskDefinition = updatedTaskDefinition
                             taskDefinition.containerDefinitions[0].image = newImage.toString()
 
                             echo "Updated Task Definition: ${taskDefinition}"
