@@ -66,7 +66,7 @@ pipeline {
 
                             echo "Updated Task Definition: ${taskDefinition}"
 
-                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${taskDefinition.toString()}' --region ap-southeast-1", returnStdout: true).trim()
+                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${taskDefinition}' --region ap-southeast-1", returnStdout: true).trim()
 
                             echo "Register Output: ${registerOutput}"
 
