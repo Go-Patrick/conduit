@@ -60,13 +60,12 @@ pipeline {
                             def oldTaskDefinition = sh(script: 'aws ecs describe-task-definition --task-definition turbo-fe', returnStdout: true).trim()
 
                             def json = readJSON text: oldTaskDefinition
-                            json.taskDefinition.containerDefinitions[0].image = "${newImage}"
-
-                            def updatedTaskDefinition = json.taskDefinition as groovy.json.JsonOutput
+                            def taskDefinition = json.taskDefinition
+                            taskDefinition.containerDefinitions[0].image = = "${newImage}"
 
                             echo "Updated Task Definition: ${updatedTaskDefinition}"
 
-                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${updatedTaskDefinition}' --region ap-southeast-1", returnStdout: true).trim()
+                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${taskDefinition}' --region ap-southeast-1", returnStdout: true).trim()
 
                             echo "Register Output: ${registerOutput}"
 
