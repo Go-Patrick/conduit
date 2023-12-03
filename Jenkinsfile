@@ -7,7 +7,7 @@ pipeline {
         FE_IMAGE_NAME="turbo-fe"
         BE_IMAGE_NAME="turbo-be"
         ECR_URL="932782693588.dkr.ecr.ap-southeast-1.amazonaws.com"
-        BE_URL="http://turbo-be-1260018261.ap-southeast-1.elb.amazonaws.com"
+        BE_URL="http://backend.turbo.backend.com:3001"
     }
 
     tools{
@@ -57,25 +57,20 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            def oldTaskDefinition = sh 'aws ecs describe-task-definition --task-definition turbo-fe'
+                            def oldTaskDefinition = sh(script: 'aws ecs describe-task-definition --task-definition turbo-fe', returnStdout: true).trim()
 
-                            sh 'echo ${oldTaskDefinition}'
-                            def json = loadJSONFromString text: oldTaskDefinition
-                            json.taskDefinition.containerDefinitions.each { containerDefinition ->
-                                if (containerDefinition.name == 'turbo-fe') {
-                                    containerDefinition.image = "${newImage}"
-                                }
-                            }
+                            def json = readJSON text: oldTaskDefinition
+                            json.taskDefinition.containerDefinitions[0].image = "${newImage}"
 
-                            def taskDef = writeJSON returnText: true, json: json.taskDefinition
+                            def updatedTaskDefinition = json.taskDefinition as groovy.json.JsonOutput
 
-                            sh 'echo ${taskDef}'
+                            echo "Updated Task Definition: ${updatedTaskDefinition}"
 
-                            sh '''
-                            aws ecs register-task-definition --family turbo-fe --container-definitions ${taskDef}
+                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${updatedTaskDefinition}' --region ap-southeast-1", returnStdout: true).trim()
 
-                            aws ecs update-service --cluster turbo-fe --service turbo-fe --image=${newImage} --force-new-deployment --region ap-southeast-1
-                            '''
+                            echo "Register Output: ${registerOutput}"
+
+                            sh "aws ecs update-service --cluster turbo-fe --service turbo-fe --task-definition ${registerOutput.taskDefinition.taskDefinitionArn} --force-new-deployment --region ap-southeast-1"
                         }
                     } catch (Exception e){
                         echo "Caught exception:  ${e}"

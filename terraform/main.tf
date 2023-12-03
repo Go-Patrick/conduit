@@ -2,13 +2,13 @@ module "vpc" {
   source = "./modules/vpc"
 }
 
-module "elb_be" {
-  source                 = "./modules/elb_be"
-  load_balancer_sg       = module.vpc.be_load_balancer_sg
-  load_balancer_subnet_a = module.vpc.be_elb_subnet_a
-  load_balancer_subnet_b = module.vpc.be_elb_subnet_b
-  vpc                    = module.vpc.vpc
-}
+#module "elb_be" {
+#  source                 = "./modules/elb_be"
+#  load_balancer_sg       = module.vpc.be_load_balancer_sg
+#  load_balancer_subnet_a = module.vpc.be_elb_subnet_a
+#  load_balancer_subnet_b = module.vpc.be_elb_subnet_b
+#  vpc                    = module.vpc.vpc
+#}
 
 module "elb_fe" {
   source                 = "./modules/elb_fe"
@@ -56,16 +56,18 @@ module "ecs_be" {
   ecs_sg           = module.vpc.ecs_be_sg
   ecs_subnet_a     = module.vpc.ecs_be_subnet_a
   ecs_subnet_b     = module.vpc.ecs_be_subnet_b
-  ecs_target_group = module.elb_be.ecs_target_group
+#  ecs_target_group = module.elb_be.ecs_target_group
   image_url        = module.ecr.ecr_be_url
   jwt_secret       = var.jwt_secret
   rds_url          = module.rds.rds_public_url
   ecr_sg           = module.vpc.ecr_vpc_endpoint_sg
+  ecs_target_group = ""
+  vpc              = module.vpc.vpc.id
 }
 
 module "ecs_fe" {
   source           = "./modules/ecs_fe"
-  backend_url      = module.elb_be.lb_url
+  backend_url      = "backend.turbo.backend.com"
   ecs_sg           = module.vpc.ecs_fe_sg
   ecs_subnet_a     = module.vpc.ecs_fe_subnet_a
   ecs_subnet_b     = module.vpc.ecs_fe_subnet_b

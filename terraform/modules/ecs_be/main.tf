@@ -79,10 +79,35 @@ resource "aws_ecs_service" "turbo_be" {
     assign_public_ip = true
   }
 
-  load_balancer {
-    target_group_arn = var.ecs_target_group.arn
-    container_name = "turbo-be"
-    container_port = 3001
+  service_registries {
+    registry_arn = aws_service_discovery_service.turbo_be.arn
+  }
+#  load_balancer {
+#    target_group_arn = var.ecs_target_group.arn
+#    container_name = "turbo-be"
+#    container_port = 3001
+#  }
+}
+
+resource "aws_service_discovery_private_dns_namespace" "turbo_be" {
+  name = "turbo.backend.com"
+  vpc  = var.vpc
+}
+
+resource "aws_service_discovery_service" "turbo_be" {
+  name = "backend"
+
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.turbo_be.id
+
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
   }
 }
 

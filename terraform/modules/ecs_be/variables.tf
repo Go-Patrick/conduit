@@ -10,6 +10,7 @@ variable "db_name" {}
 variable "db_endpoint" {}
 variable "jwt_secret" {}
 variable "ecr_sg" {}
+variable "vpc" {}
 
 variable "ecs_role_name" {
   type = string
