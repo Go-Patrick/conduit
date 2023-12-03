@@ -37,6 +37,16 @@ resource "aws_subnet" "load_balancer_fe_2" {
   }
 }
 
+resource "aws_subnet" "nat" {
+  vpc_id = aws_vpc.main.id
+  availability_zone   = "ap-southeast-1a"
+  cidr_block = var.vpc_public_cidr_block[2]
+
+  tags = {
+    Name="nat"
+  }
+}
+
 resource "aws_subnet" "load_balancer_be_1" {
   vpc_id = aws_vpc.main.id
   availability_zone   = "ap-southeast-1a"
@@ -138,6 +148,10 @@ resource "aws_route_table_association" "public_2" {
 
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main.id
+
+  route {
+    nat_gateway_id = aws_nat_gateway.nat.id
+  }
 }
 
 resource "aws_route_table_association" "private_1" {
@@ -321,4 +335,13 @@ resource "aws_security_group" "ecr_vpc_endpoint_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_eip" "nat" {
+  vpc = true
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.nat.id
 }

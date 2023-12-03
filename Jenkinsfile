@@ -12,8 +12,8 @@ pipeline {
 
     tools{
         nodejs 'node-20'
-        jdk 'jdk-17'
-        maven 'my-maven'
+        // jdk 'jdk-17'
+        // maven 'my-maven'
     }
 
     stages {

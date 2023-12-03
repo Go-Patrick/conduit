@@ -36,17 +36,6 @@ module "ecr" {
   fe_image_name = var.fe_image_name
 }
 
-module "private_link" {
-  source = "./modules/private_link"
-  ecr_sg = module.vpc.ecr_vpc_endpoint_sg
-  private_rt = module.vpc.private_rt
-  vpc = module.vpc.vpc
-  ecs_be_subnet_a = module.vpc.ecs_be_subnet_a
-  ecs_be_subnet_b = module.vpc.ecs_be_subnet_b
-  ecs_fe_subnet_a = module.vpc.ecs_fe_subnet_a
-  ecs_fe_subnet_b = module.vpc.ecs_fe_subnet_b
-}
-
 module "service_discovery" {
   source = "./modules/service_discovery"
   vpc    = module.vpc.vpc.id
