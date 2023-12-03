@@ -63,7 +63,7 @@ pipeline {
                             def json = readJSON text: oldTaskDefinition
                             def taskDefinition = json.taskDefinition
 
-                            def updatedTaskDefinition = new Map()
+                            def updatedTaskDefinition = new HashMap()
                             updatedTaskDefinition["family"] = taskDefinition["family"]
                             updatedTaskDefinition["taskRoleArn"] = taskDefinition["taskRoleArn"]
                             updatedTaskDefinition["executionRoleArn"] = taskDefinition["executionRoleArn"]
