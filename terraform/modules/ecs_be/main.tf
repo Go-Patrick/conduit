@@ -83,11 +83,11 @@ resource "aws_ecs_service" "turbo_be" {
     registry_arn = aws_service_discovery_service.turbo_be.arn
   }
 
-#  load_balancer {
-#    target_group_arn = var.ecs_target_group.arn
-#    container_name = "turbo-be"
-#    container_port = 3001
-#  }
+  load_balancer {
+    target_group_arn = var.ecs_target_group.arn
+    container_name = "turbo-be"
+    container_port = 3001
+  }
 }
 
 resource "aws_service_discovery_service" "turbo_be" {

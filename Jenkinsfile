@@ -7,7 +7,7 @@ pipeline {
         FE_IMAGE_NAME="turbo-fe"
         BE_IMAGE_NAME="turbo-be"
         ECR_URL="932782693588.dkr.ecr.ap-southeast-1.amazonaws.com"
-        BE_URL="http://backend.turbo.backend.com:3001"
+        BE_URL="http://turbo-be-201709353.ap-southeast-1.elb.amazonaws.com"
     }
 
     tools{
