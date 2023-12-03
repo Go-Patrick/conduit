@@ -86,6 +86,7 @@ pipeline {
                             taskDefinition.containerDefinitions[0].image = newImage.toString()
 
                             taskDefinition = taskDefinition.toString()
+                            echo "Updated Task Definition: ${taskDefinition}"
                             taskDefinition = taskDefinition.replaceFirst('[', '{').replaceLast(']', '}')
 
                             echo "Updated Task Definition: ${taskDefinition}"
