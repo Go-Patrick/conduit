@@ -59,8 +59,8 @@ pipeline {
                         docker.withRegistry("https://" + "${env.ECR_URL}/${env.BE_IMAGE_NAME}", 'ecr:ap-southeast-1:patrick-demo-1') {
                             def BE_IMAGE_NAME="${env.ECR_URL}/${env.BE_IMAGE_NAME}:${env.SHORT_COMMIT}"
                             def beImage = docker.build("$BE_IMAGE_NAME", "-f apps/backend/Dockerfile .")
-                            feImage.push(env.SHORT_COMMIT)
-                            feImage.push("latest")
+                            beImage.push(env.SHORT_COMMIT)
+                            beImage.push("latest")
                         }
                     } catch (Exception e) {
                         echo "Caught exception: ${e}"
