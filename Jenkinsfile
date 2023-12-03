@@ -85,11 +85,11 @@ pipeline {
                             taskDefinition = updatedTaskDefinition
                             taskDefinition.containerDefinitions[0].image = newImage.toString()
 
-                            def updatedTaskDefinition = JSON.parse(taskDefinition)
+                            def newTaskDefinition = JSON.parse(taskDefinition)
 
-                            echo "Updated Task Definition: ${updatedTaskDefinition}"
+                            echo "Updated Task Definition: ${newTaskDefinition}"
 
-                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${updatedTaskDefinition.toString()}' --region ap-southeast-1", returnStdout: true).trim()
+                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${newTaskDefinition.toString()}' --region ap-southeast-1", returnStdout: true).trim()
 
                             echo "Register Output: ${registerOutput}"
 
