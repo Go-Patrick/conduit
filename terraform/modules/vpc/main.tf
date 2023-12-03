@@ -268,7 +268,7 @@ resource "aws_security_group" "private_ecs_be" {
     from_port = var.ecs_be_port
     to_port = var.ecs_be_port
     protocol = "tcp"
-    security_groups = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     description = "Allow all outbound traffic"

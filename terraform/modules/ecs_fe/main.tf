@@ -80,6 +80,27 @@ resource "aws_ecs_service" "turbo_fe" {
     container_name = "turbo-fe"
     container_port = 3000
   }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.turbo_fe.arn
+  }
+}
+
+resource "aws_service_discovery_service" "turbo_fe" {
+  name = "frontend"
+
+  dns_config {
+    namespace_id = var.service_namespace
+
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
 }
 
 resource "aws_appautoscaling_target" "dev_to_target" {

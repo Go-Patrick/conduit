@@ -47,6 +47,11 @@ module "private_link" {
   ecs_fe_subnet_b = module.vpc.ecs_fe_subnet_b
 }
 
+module "service_discovery" {
+  source = "./modules/service_discovery"
+  vpc    = module.vpc.vpc.id
+}
+
 module "ecs_be" {
   source           = "./modules/ecs_be"
   db_endpoint      = module.rds.rds_public_url
@@ -63,6 +68,7 @@ module "ecs_be" {
   ecr_sg           = module.vpc.ecr_vpc_endpoint_sg
   ecs_target_group = ""
   vpc              = module.vpc.vpc.id
+  service_namespace = module.service_discovery.namespace.id
 }
 
 module "ecs_fe" {
@@ -75,4 +81,5 @@ module "ecs_fe" {
   image_name       = module.ecr.ecr_fe_url
   vpc              = module.vpc.vpc.id
   ecr_sg           = module.vpc.ecr_vpc_endpoint_sg
+  service_namespace = module.service_discovery.namespace.id
 }

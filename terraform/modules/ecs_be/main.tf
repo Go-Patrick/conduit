@@ -89,16 +89,11 @@ resource "aws_ecs_service" "turbo_be" {
 #  }
 }
 
-resource "aws_service_discovery_private_dns_namespace" "turbo_be" {
-  name = "turbo.backend.com"
-  vpc  = var.vpc
-}
-
 resource "aws_service_discovery_service" "turbo_be" {
   name = "backend"
 
   dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.turbo_be.id
+    namespace_id = var.service_namespace
 
     dns_records {
       ttl  = 10
