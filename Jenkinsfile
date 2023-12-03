@@ -57,11 +57,12 @@ pipeline {
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
                             newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
+                            echo newImage
                             def oldTaskDefinition = sh(script: 'aws ecs describe-task-definition --task-definition turbo-fe', returnStdout: true).trim()
 
                             def json = readJSON text: oldTaskDefinition
                             def taskDefinition = json.taskDefinition
-                            taskDefinition.containerDefinitions[0].image = newImage
+                            taskDefinition.containerDefinitions[0].image = "${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
 
                             echo "Updated Task Definition: ${taskDefinition}"
 
