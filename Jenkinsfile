@@ -41,10 +41,44 @@ pipeline {
                         docker.withRegistry("https://" + "${env.ECR_URL}/${env.FE_IMAGE_NAME}", 'ecr:ap-southeast-1:patrick-demo-1') {
                             def FE_IMAGE_NAME="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
                             def feImage = docker.build("$FE_IMAGE_NAME", "--build-arg NEXT_PUBLIC_BASE_URL=${env.BE_URL} -f apps/frontend/Dockerfile .")
-                            feImage.push()
+                            feImage.push(env.SHORT_COMMIT)
+                            feImage.push("latest")
                         }
                     } catch (Exception e) {
                         echo "Caught exception: ${e}"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
+        stage('Build backend image'){
+            steps{
+                script{
+                    try{
+                        docker.withRegistry("https://" + "${env.ECR_URL}/${env.BE_IMAGE_NAME}", 'ecr:ap-southeast-1:patrick-demo-1') {
+                            def BE_IMAGE_NAME="${env.ECR_URL}/${env.BE_IMAGE_NAME}:${env.SHORT_COMMIT}"
+                            def beImage = docker.build("$BE_IMAGE_NAME", "-f apps/backend/Dockerfile .")
+                            feImage.push(env.SHORT_COMMIT)
+                            feImage.push("latest")
+                        }
+                    } catch (Exception e) {
+                        echo "Caught exception: ${e}"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy new backend version'){
+            steps{
+                script{
+                    try{
+                        withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
+                            sh 'aws ecs update-service --cluster turbo-be --service turbo-be --force-new-deployment'
+                        }
+                    } catch (Exception e){
+                        echo "Caught exception:  ${e}"
                         currentBuild.result = 'FAILURE'
                     }
                 }
@@ -56,46 +90,7 @@ pipeline {
                 script{
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
-                            newImage="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            echo newImage
-                            def oldTaskDefinition = sh(script: 'aws ecs describe-task-definition --task-definition turbo-fe', returnStdout: true).trim()
-
-                            def json = readJSON text: oldTaskDefinition
-                            def taskDefinition = json.taskDefinition
-
-                            def updatedTaskDefinition = new HashMap()
-                            updatedTaskDefinition["family"] = taskDefinition["family"]
-                            updatedTaskDefinition["taskRoleArn"] = taskDefinition["taskRoleArn"]
-                            updatedTaskDefinition["executionRoleArn"] = taskDefinition["executionRoleArn"]
-                            updatedTaskDefinition["networkMode"] = taskDefinition["networkMode"]
-                            updatedTaskDefinition["containerDefinitions"] = taskDefinition["containerDefinitions"]
-                            updatedTaskDefinition["volumes"] = taskDefinition["volumes"]
-                            updatedTaskDefinition["placementConstraints"] = taskDefinition["placementConstraints"]
-                            updatedTaskDefinition["requiresCompatibilities"] = taskDefinition["requiresCompatibilities"]
-                            updatedTaskDefinition["cpu"] = taskDefinition["cpu"]
-                            updatedTaskDefinition["memory"] = taskDefinition["memory"]
-                            updatedTaskDefinition["tags"] = taskDefinition["tags"]
-                            updatedTaskDefinition["pidMode"] = taskDefinition["pidMode"]
-                            updatedTaskDefinition["ipcMode"] = taskDefinition["ipcMode"]
-                            updatedTaskDefinition["proxyConfiguration"] = taskDefinition["proxyConfiguration"]
-                            updatedTaskDefinition["inferenceAccelerators"] = taskDefinition["inferenceAccelerators"]
-                            updatedTaskDefinition["ephemeralStorage"] = taskDefinition["ephemeralStorage"]
-                            updatedTaskDefinition["runtimePlatform"] = taskDefinition["runtimePlatform"]
-
-                            taskDefinition = updatedTaskDefinition
-                            taskDefinition.containerDefinitions[0].image = newImage.toString()
-
-                            taskDefinition = taskDefinition.toString()
-                            echo "Updated Task Definition: ${taskDefinition}"
-                            taskDefinition = taskDefinition.replaceFirst('[', '{').replaceLast(']', '}')
-
-                            echo "Updated Task Definition: ${taskDefinition}"
-
-                            def registerOutput = sh(script: "aws ecs register-task-definition --cli-input-json '${taskDefinition}' --region ap-southeast-1", returnStdout: true).trim()
-
-                            echo "Register Output: ${registerOutput}"
-
-                            sh "aws ecs update-service --cluster turbo-fe --service turbo-fe --task-definition ${registerOutput.taskDefinition.taskDefinitionArn} --force-new-deployment --region ap-southeast-1"
+                            sh 'aws ecs update-service --cluster turbo-fe --service turbo-fe --force-new-deployment'
                         }
                     } catch (Exception e){
                         echo "Caught exception:  ${e}"
