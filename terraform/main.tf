@@ -2,13 +2,13 @@ module "vpc" {
   source = "./modules/vpc"
 }
 
-module "elb_be" {
-  source                 = "./modules/elb_be"
-  load_balancer_sg       = module.vpc.be_load_balancer_sg
-  load_balancer_subnet_a = module.vpc.be_elb_subnet_a
-  load_balancer_subnet_b = module.vpc.be_elb_subnet_b
-  vpc                    = module.vpc.vpc
-}
+#module "elb_be" {
+#  source                 = "./modules/elb_be"
+#  load_balancer_sg       = module.vpc.be_load_balancer_sg
+#  load_balancer_subnet_a = module.vpc.be_elb_subnet_a
+#  load_balancer_subnet_b = module.vpc.be_elb_subnet_b
+#  vpc                    = module.vpc.vpc
+#}
 
 module "elb_fe" {
   source                 = "./modules/elb_fe"
@@ -55,7 +55,7 @@ module "ecs_be" {
   jwt_secret       = var.jwt_secret
   rds_url          = module.rds.rds_public_url
   ecr_sg           = module.vpc.ecr_vpc_endpoint_sg
-  ecs_target_group = module.elb_be.ecs_target_group
+  ecs_target_group = ""
   vpc              = module.vpc.vpc.id
   service_namespace = module.service_discovery.namespace.id
 }

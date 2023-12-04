@@ -146,6 +146,11 @@ resource "aws_route_table_association" "public_2" {
   subnet_id = aws_subnet.load_balancer_fe_2.id
 }
 
+resource "aws_route_table_association" "public_3" {
+  route_table_id = aws_route_table.public_rt.id
+  subnet_id = aws_subnet.nat.id
+}
+
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main.id
 
@@ -189,6 +194,16 @@ resource "aws_route_table_association" "private_7" {
   route_table_id = aws_route_table.private_rt.id
   subnet_id = aws_subnet.load_balancer_be_2.id
 }
+
+#resource "aws_route_table_association" "private_6" {
+#  route_table_id = aws_route_table.public_rt.id
+#  subnet_id = aws_subnet.load_balancer_be_1.id
+#}
+#
+#resource "aws_route_table_association" "private_7" {
+#  route_table_id = aws_route_table.public_rt.id
+#  subnet_id = aws_subnet.load_balancer_be_2.id
+#}
 
 resource "aws_route_table_association" "private_8" {
   route_table_id = aws_route_table.private_rt.id
@@ -234,14 +249,14 @@ resource "aws_security_group" "alb_be" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    security_groups = [aws_security_group.private_ecs_fe.id]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    security_groups = [aws_security_group.private_ecs_fe.id]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -283,7 +298,7 @@ resource "aws_security_group" "private_ecs_be" {
     from_port = var.ecs_be_port
     to_port = var.ecs_be_port
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_be.id]
   }
   egress {
     description = "Allow all outbound traffic"
@@ -321,8 +336,6 @@ resource "aws_security_group" "ecr_vpc_endpoint_sg" {
 
   vpc_id = aws_vpc.main.id
 
-  # Define ingress and egress rules as needed for your use case
-  # For example, allow all traffic from the ECS instances
   ingress {
     from_port   = 0
     to_port     = 0
@@ -339,7 +352,7 @@ resource "aws_security_group" "ecr_vpc_endpoint_sg" {
 }
 
 resource "aws_eip" "nat" {
-  vpc = true
+  domain = "vpc"
 }
 
 resource "aws_nat_gateway" "nat" {
