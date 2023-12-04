@@ -24,7 +24,7 @@ COPY --from=builder /app/turbo.json ./turbo.json
 COPY --from=builder /app/apps/backend/prisma ./prisma
 RUN yarn install
 RUN prisma generate
-RUN prisma migrate production
+RUN prisma migrate deploy
 
 # Build the project
 COPY --from=builder /app/out/full/ .
