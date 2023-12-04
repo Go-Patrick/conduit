@@ -1,6 +1,6 @@
 resource "aws_lb" "elb" {
   name               = "turbo-be"
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [var.load_balancer_sg.id]
   subnets            = [var.load_balancer_subnet_a.id,var.load_balancer_subnet_b.id]
