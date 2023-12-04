@@ -5,7 +5,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 # Set working directory
 WORKDIR /app
-RUN yarn global add turbo
+RUN yarn global add turbo prisma
 COPY . .
 RUN turbo prune --scope=backend --docker
 
@@ -24,6 +24,7 @@ COPY --from=builder /app/turbo.json ./turbo.json
 COPY --from=builder /app/apps/backend/prisma ./prisma
 RUN yarn install
 RUN prisma generate
+RUN prisma migrate production
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -38,9 +39,6 @@ USER nestjs
 
 WORKDIR /app
 COPY --from=installer --chown=nestjs:nodejs /app/ .
-
-RUN yarn prisma migrate production
-RUN yarn prisma migrate dev
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 3001
