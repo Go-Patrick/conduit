@@ -39,6 +39,9 @@ USER nestjs
 WORKDIR /app
 COPY --from=installer --chown=nestjs:nodejs /app/ .
 
+RUN yarn prisma migrate production
+RUN yarn prisma migrate dev
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 3001
 CMD [ "node", "apps/backend/dist/main.js" ]
