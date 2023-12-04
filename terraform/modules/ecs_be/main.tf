@@ -25,7 +25,7 @@ resource "aws_ecs_task_definition" "dev_to" {
     "cpu": 512,
     "environment": [
       {
-        "name": "NEXT_PUBLIC_HOST_URL",
+        "name": "DATABASE_URL",
         "value": "postgresql://${var.db_username}:${var.db_password}@${var.db_endpoint}/${var.db_name}"
       },
       {
@@ -79,10 +79,31 @@ resource "aws_ecs_service" "turbo_be" {
     assign_public_ip = true
   }
 
+  service_registries {
+    registry_arn = aws_service_discovery_service.turbo_be.arn
+  }
+
   load_balancer {
     target_group_arn = var.ecs_target_group.arn
     container_name = "turbo-be"
     container_port = 3001
+  }
+}
+
+resource "aws_service_discovery_service" "turbo_be" {
+  name = "backend"
+
+  dns_config {
+    namespace_id = var.service_namespace
+
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
   }
 }
 

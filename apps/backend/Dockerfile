@@ -5,7 +5,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 # Set working directory
 WORKDIR /app
-RUN yarn global add turbo
+RUN yarn global add turbo prisma
 COPY . .
 RUN turbo prune --scope=backend --docker
 
@@ -17,11 +17,11 @@ RUN yarn global add prisma
 WORKDIR /app
 
 # First install the dependencies (as they change less often)
-COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
 COPY --from=builder /app/turbo.json ./turbo.json
 COPY --from=builder /app/apps/backend/prisma ./prisma
+COPY --from=builder /app/apps/backend/docker-entrypoint.sh /docker-entrypoint.sh
 RUN yarn install
 RUN prisma generate
 
@@ -39,5 +39,7 @@ USER nestjs
 WORKDIR /app
 COPY --from=installer --chown=nestjs:nodejs /app/ .
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+RUN chmod +x apps/backend/docker-entrypoint.sh
+ENTRYPOINT ["apps/backend/docker-entrypoint.sh"]
+EXPOSE 3001
 CMD [ "node", "apps/backend/dist/main.js" ]
