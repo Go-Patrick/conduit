@@ -25,7 +25,7 @@ resource "aws_ecs_task_definition" "dev_to" {
     "cpu": 512,
     "environment": [
       {
-        "name": "NEXT_PUBLIC_HOST_URL",
+        "name": "DATABASE_URL",
         "value": "postgresql://${var.db_username}:${var.db_password}@${var.db_endpoint}/${var.db_name}"
       },
       {
