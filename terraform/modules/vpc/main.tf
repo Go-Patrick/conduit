@@ -170,19 +170,24 @@ resource "aws_route_table_association" "private_2" {
   subnet_id = aws_subnet.ecs_be_2.id
 }
 
-resource "aws_route_table_association" "private_3" {
+resource "aws_route_table_association" "private_5" {
   route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.ecs_fe_1.id
+  subnet_id = aws_subnet.rds_1.id
 }
 
-resource "aws_route_table_association" "private_4" {
+resource "aws_route_table_association" "private_8" {
   route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.ecs_fe_2.id
+  subnet_id = aws_subnet.rds_2.id
 }
 
 resource "aws_route_table_association" "private_5" {
   route_table_id = aws_route_table.private_rt.id
   subnet_id = aws_subnet.rds_1.id
+}
+
+resource "aws_route_table_association" "private_8" {
+  route_table_id = aws_route_table.private_rt.id
+  subnet_id = aws_subnet.rds_2.id
 }
 
 #resource "aws_route_table_association" "private_6" {
@@ -203,11 +208,6 @@ resource "aws_route_table_association" "private_6" {
 resource "aws_route_table_association" "private_7" {
   route_table_id = aws_route_table.public_rt.id
   subnet_id = aws_subnet.load_balancer_be_2.id
-}
-
-resource "aws_route_table_association" "private_8" {
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.rds_2.id
 }
 
 resource "aws_security_group" "alb_fe" {

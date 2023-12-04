@@ -12,8 +12,6 @@ pipeline {
 
     tools{
         nodejs 'node-20'
-        // jdk 'jdk-17'
-        // maven 'my-maven'
     }
 
     stages {
@@ -33,25 +31,13 @@ pipeline {
         //     }
         // }
 
-        stage('Build frontend image'){
-            steps{
-                script{
-                    try{
-                        docker.withRegistry("https://" + "${env.ECR_URL}/${env.FE_IMAGE_NAME}", 'ecr:ap-southeast-1:patrick-demo-1') {
-                            def FE_IMAGE_NAME="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
-                            def feImage = docker.build("$FE_IMAGE_NAME", "--build-arg NEXT_PUBLIC_BASE_URL=${env.BE_URL} -f apps/frontend/Dockerfile .")
-                            feImage.push(env.SHORT_COMMIT)
-                            feImage.push("latest")
-                        }
-                    } catch (Exception e) {
-                        echo "Caught exception: ${e}"
-                        currentBuild.result = 'FAILURE'
-                    }
+        stage('Build backend image'){
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
                 }
             }
-        }
-
-        stage('Build backend image'){
             steps{
                 script{
                     try{
@@ -70,6 +56,12 @@ pipeline {
         }
 
         stage('Deploy new backend version'){
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps{
                 script{
                     try{
@@ -84,7 +76,37 @@ pipeline {
             }
         }
 
+        stage('Build frontend image'){
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
+            steps{
+                script{
+                    try{
+                        docker.withRegistry("https://" + "${env.ECR_URL}/${env.FE_IMAGE_NAME}", 'ecr:ap-southeast-1:patrick-demo-1') {
+                            def FE_IMAGE_NAME="${env.ECR_URL}/${env.FE_IMAGE_NAME}:${env.SHORT_COMMIT}"
+                            def feImage = docker.build("$FE_IMAGE_NAME", "--build-arg NEXT_PUBLIC_BASE_URL=${env.BE_URL} -f apps/frontend/Dockerfile .")
+                            feImage.push(env.SHORT_COMMIT)
+                            feImage.push("latest")
+                        }
+                    } catch (Exception e) {
+                        echo "Caught exception: ${e}"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
         stage('Deploy new frontend version'){
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps{
                 script{
                     try{

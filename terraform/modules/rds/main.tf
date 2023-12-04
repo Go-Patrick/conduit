@@ -1,7 +1,3 @@
-module "vpc" {
-  source = "../vpc"
-}
-
 resource "aws_db_subnet_group" "db_subnet_group" {
   name = "db-subnets"
   description = "Subnet group for private database"

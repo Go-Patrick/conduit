@@ -36,10 +36,10 @@ module "ecr" {
   fe_image_name = var.fe_image_name
 }
 
-module "service_discovery" {
-  source = "./modules/service_discovery"
-  vpc    = module.vpc.vpc.id
-}
+#module "service_discovery" {
+#  source = "./modules/service_discovery"
+#  vpc    = module.vpc.vpc.id
+#}
 
 module "ecs_be" {
   source           = "./modules/ecs_be"
@@ -50,14 +50,12 @@ module "ecs_be" {
   ecs_sg           = module.vpc.ecs_be_sg
   ecs_subnet_a     = module.vpc.ecs_be_subnet_a
   ecs_subnet_b     = module.vpc.ecs_be_subnet_b
-#  ecs_target_group = module.elb_be.ecs_target_group
   image_url        = module.ecr.ecr_be_url
   jwt_secret       = var.jwt_secret
   rds_url          = module.rds.rds_public_url
   ecr_sg           = module.vpc.ecr_vpc_endpoint_sg
   ecs_target_group = module.elb_be.ecs_target_group
   vpc              = module.vpc.vpc.id
-  service_namespace = module.service_discovery.namespace.id
 }
 
 module "ecs_fe" {
@@ -70,5 +68,4 @@ module "ecs_fe" {
   image_name       = module.ecr.ecr_fe_url
   vpc              = module.vpc.vpc.id
   ecr_sg           = module.vpc.ecr_vpc_endpoint_sg
-  service_namespace = module.service_discovery.namespace.id
 }

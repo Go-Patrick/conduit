@@ -6,7 +6,7 @@ variable "backend_url" {}
 variable "image_name" {}
 variable "vpc" {}
 variable "ecr_sg" {}
-variable "service_namespace" {}
+#variable "service_namespace" {}
 
 variable "ecs_role_name" {
   type = string
