@@ -6,3 +6,4 @@ variable "jwt_secret" {}
 
 variable "be_image_name" {}
 variable "fe_image_name" {}
+variable "ecs_role_name" {}

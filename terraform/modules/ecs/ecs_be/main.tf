@@ -1,4 +1,4 @@
-resource "aws_ecs_cluster" "turbo_be" {
+resource "aws_ecs_cluster" "be_ecs_cluster" {
   name = "turbo-be"
   setting {
     name = "containerInsights"
@@ -10,16 +10,16 @@ resource "aws_ecs_cluster" "turbo_be" {
   }
 }
 
-resource "aws_ecs_task_definition" "dev_to" {
+resource "aws_ecs_task_definition" "be_ecs_task_def" {
   family = "turbo-be"
   container_definitions = <<TASK_DEFINITION
   [
   {
     "portMappings": [
       {
-        "hostPort": 3001,
+        "hostPort": ${var.container_port},
         "protocol": "tcp",
-        "containerPort": 3001
+        "containerPort": ${var.container_port}
       }
     ],
     "cpu": 512,
@@ -61,10 +61,10 @@ TASK_DEFINITION
   }
 }
 
-resource "aws_ecs_service" "turbo_be" {
+resource "aws_ecs_service" "be_ecs_service" {
   name = "turbo-be"
-  cluster = aws_ecs_cluster.turbo_be.id
-  task_definition = aws_ecs_task_definition.dev_to.arn
+  cluster = aws_ecs_cluster.be_ecs_cluster.id
+  task_definition = aws_ecs_task_definition.be_ecs_task_def.arn
   desired_count = 1
   launch_type = "FARGATE"
   platform_version = "1.4.0"
@@ -74,43 +74,22 @@ resource "aws_ecs_service" "turbo_be" {
   }
 
   network_configuration {
-    subnets = [var.ecs_subnet_a.id, var.ecs_subnet_b.id]
-    security_groups = [var.ecs_sg.id,var.ecr_sg.id]
+    subnets = var.ecs_subnet_list
+    security_groups = [var.ecs_sg]
     assign_public_ip = true
   }
 
-  service_registries {
-    registry_arn = aws_service_discovery_service.turbo_be.arn
-  }
-
   load_balancer {
-    target_group_arn = var.ecs_target_group.arn
+    target_group_arn = var.ecs_target_group
     container_name = "turbo-be"
-    container_port = 3001
+    container_port = var.container_port
   }
 }
 
-resource "aws_service_discovery_service" "turbo_be" {
-  name = "backend"
-
-  dns_config {
-    namespace_id = var.service_namespace
-
-    dns_records {
-      ttl  = 10
-      type = "A"
-    }
-  }
-
-  health_check_custom_config {
-    failure_threshold = 1
-  }
-}
-
-resource "aws_appautoscaling_target" "dev_to_target" {
+resource "aws_appautoscaling_target" "be_asl_target" {
   max_capacity = 2
   min_capacity = 1
-  resource_id = "service/${aws_ecs_cluster.turbo_be.name}/${aws_ecs_service.turbo_be.name}"
+  resource_id = "service/${aws_ecs_cluster.be_ecs_cluster.name}/${aws_ecs_service.be_ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace = "ecs"
 }
@@ -118,9 +97,9 @@ resource "aws_appautoscaling_target" "dev_to_target" {
 resource "aws_appautoscaling_policy" "dev_to_memory" {
   name               = "dev-to-memory-be"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.dev_to_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.dev_to_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.dev_to_target.service_namespace
+  resource_id        = aws_appautoscaling_target.be_asl_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.be_asl_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.be_asl_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -134,9 +113,9 @@ resource "aws_appautoscaling_policy" "dev_to_memory" {
 resource "aws_appautoscaling_policy" "dev_to_cpu" {
   name = "dev-to-cpu-be"
   policy_type = "TargetTrackingScaling"
-  resource_id = aws_appautoscaling_target.dev_to_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.dev_to_target.scalable_dimension
-  service_namespace = aws_appautoscaling_target.dev_to_target.service_namespace
+  resource_id = aws_appautoscaling_target.be_asl_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.be_asl_target.scalable_dimension
+  service_namespace = aws_appautoscaling_target.be_asl_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {

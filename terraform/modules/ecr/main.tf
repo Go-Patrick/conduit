@@ -1,4 +1,4 @@
-resource "aws_ecr_repository" "conduit_be" {
+resource "aws_ecr_repository" "api_ecr" {
   name = var.be_image_name
 
   image_scanning_configuration {
@@ -6,7 +6,7 @@ resource "aws_ecr_repository" "conduit_be" {
   }
 }
 
-resource "aws_ecr_repository" "conduit_fe" {
+resource "aws_ecr_repository" "fe_ecr" {
   name = var.fe_image_name
 
   image_scanning_configuration {
@@ -14,8 +14,8 @@ resource "aws_ecr_repository" "conduit_fe" {
   }
 }
 
-resource "aws_ecr_repository_policy" "conduit_be" {
-  repository = aws_ecr_repository.conduit_be.id
+resource "aws_ecr_repository_policy" "api_repo_policy" {
+  repository = aws_ecr_repository.api_ecr.id
 
   policy = <<EOF
   {
@@ -40,8 +40,8 @@ resource "aws_ecr_repository_policy" "conduit_be" {
   EOF
 }
 
-resource "aws_ecr_repository_policy" "conduit_fe" {
-  repository = aws_ecr_repository.conduit_fe.id
+resource "aws_ecr_repository_policy" "fe_repo_policy" {
+  repository = aws_ecr_repository.fe_ecr.id
 
   policy = <<EOF
   {
@@ -66,8 +66,8 @@ resource "aws_ecr_repository_policy" "conduit_fe" {
   EOF
 }
 
-resource "aws_ecr_lifecycle_policy" "ecr_policy_be" {
-  repository = aws_ecr_repository.conduit_be.name
+resource "aws_ecr_lifecycle_policy" "api_ecr_policy" {
+  repository = aws_ecr_repository.api_ecr.name
 
   policy = <<EOF
 {
@@ -90,8 +90,8 @@ resource "aws_ecr_lifecycle_policy" "ecr_policy_be" {
 EOF
 }
 
-resource "aws_ecr_lifecycle_policy" "ecr_policy_fe" {
-  repository = aws_ecr_repository.conduit_fe.name
+resource "aws_ecr_lifecycle_policy" "fe_ecr_policy" {
+  repository = aws_ecr_repository.fe_ecr.name
 
   policy = <<EOF
 {

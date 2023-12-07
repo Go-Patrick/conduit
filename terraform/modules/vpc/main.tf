@@ -1,4 +1,4 @@
-resource "aws_vpc" "main" {
+resource "aws_vpc" "main_vpc" {
   cidr_block = var.vpc_cidr_block
 
   enable_dns_hostnames = "true"
@@ -10,15 +10,15 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_internet_gateway" "internet_gw" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   tags = {
     "Name" = "demo1-gw"
   }
 }
 
-resource "aws_subnet" "load_balancer_fe_1" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "fe_alb_subnet_1" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone   = "ap-southeast-1a"
   cidr_block = var.vpc_public_cidr_block[0]
 
@@ -27,8 +27,8 @@ resource "aws_subnet" "load_balancer_fe_1" {
   }
 }
 
-resource "aws_subnet" "load_balancer_fe_2" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "fe_alb_subnet_2" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone   = "ap-southeast-1b"
   cidr_block = var.vpc_public_cidr_block[1]
 
@@ -37,8 +37,8 @@ resource "aws_subnet" "load_balancer_fe_2" {
   }
 }
 
-resource "aws_subnet" "nat" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "nat_subnet" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone   = "ap-southeast-1a"
   cidr_block = var.vpc_public_cidr_block[2]
 
@@ -47,8 +47,8 @@ resource "aws_subnet" "nat" {
   }
 }
 
-resource "aws_subnet" "load_balancer_be_1" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "be_elb_subnet_1" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone   = "ap-southeast-1a"
   cidr_block = var.vpc_private_cidr_block[5]
 
@@ -57,8 +57,8 @@ resource "aws_subnet" "load_balancer_be_1" {
   }
 }
 
-resource "aws_subnet" "load_balancer_be_2" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "be_elb_subnet_2" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone   = "ap-southeast-1b"
   cidr_block = var.vpc_private_cidr_block[6]
 
@@ -67,8 +67,8 @@ resource "aws_subnet" "load_balancer_be_2" {
   }
 }
 
-resource "aws_subnet" "ecs_be_1" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "ecs_be_subnet_1" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone = "ap-southeast-1a"
   cidr_block = var.vpc_private_cidr_block[0]
 
@@ -77,8 +77,8 @@ resource "aws_subnet" "ecs_be_1" {
   }
 }
 
-resource "aws_subnet" "ecs_be_2" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "ecs_be_subnet_2" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone = "ap-southeast-1b"
   cidr_block = var.vpc_private_cidr_block[1]
 
@@ -87,8 +87,8 @@ resource "aws_subnet" "ecs_be_2" {
   }
 }
 
-resource "aws_subnet" "ecs_fe_1" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "ecs_fe_subnet_1" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone = "ap-southeast-1a"
   cidr_block = var.vpc_private_cidr_block[2]
 
@@ -97,8 +97,8 @@ resource "aws_subnet" "ecs_fe_1" {
   }
 }
 
-resource "aws_subnet" "ecs_fe_2" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "ecs_fe_subnet_2" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone = "ap-southeast-1b"
   cidr_block = var.vpc_private_cidr_block[3]
 
@@ -107,8 +107,8 @@ resource "aws_subnet" "ecs_fe_2" {
   }
 }
 
-resource "aws_subnet" "rds_1" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "rds_subnet_1" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone = "ap-southeast-1a"
   cidr_block = var.vpc_private_cidr_block[4]
 
@@ -117,8 +117,8 @@ resource "aws_subnet" "rds_1" {
   }
 }
 
-resource "aws_subnet" "rds_2" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "rds_subnet_2" {
+  vpc_id = aws_vpc.main_vpc.id
   availability_zone = "ap-southeast-1b"
   cidr_block = var.vpc_private_cidr_block[7]
 
@@ -128,7 +128,7 @@ resource "aws_subnet" "rds_2" {
 }
 
 resource "aws_route_table" "public_rt" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -136,85 +136,88 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
-resource "aws_route_table_association" "public_1" {
+resource "aws_route_table_association" "public_associate_1" {
   route_table_id = aws_route_table.public_rt.id
-  subnet_id = aws_subnet.load_balancer_fe_1.id
+  subnet_id = aws_subnet.fe_alb_subnet_1.id
 }
 
-resource "aws_route_table_association" "public_2" {
+resource "aws_route_table_association" "public_associate_2" {
   route_table_id = aws_route_table.public_rt.id
-  subnet_id = aws_subnet.load_balancer_fe_2.id
+  subnet_id = aws_subnet.fe_alb_subnet_2.id
 }
 
-resource "aws_route_table_association" "public_3" {
+resource "aws_route_table_association" "public_associate_3" {
   route_table_id = aws_route_table.public_rt.id
-  subnet_id = aws_subnet.nat.id
+  subnet_id = aws_subnet.nat_subnet.id
 }
 
-resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.main.id
+resource "aws_eip" "app_nat_eip" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "main_nat_gw" {
+  allocation_id = aws_eip.app_nat_eip.id
+  subnet_id     = aws_subnet.nat_subnet.id
+}
+
+resource "aws_route_table" "private_nat_rt" {
+  vpc_id = aws_vpc.main_vpc.id
 
   route {
-    nat_gateway_id = aws_nat_gateway.nat.id
+    nat_gateway_id = aws_nat_gateway.main_nat_gw.id
     cidr_block = "0.0.0.0/0"
   }
 }
 
 resource "aws_route_table_association" "private_1" {
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.ecs_be_1.id
+  route_table_id = aws_route_table.private_nat_rt.id
+  subnet_id = aws_subnet.ecs_be_subnet_1.id
 }
 
 resource "aws_route_table_association" "private_2" {
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.ecs_be_2.id
+  route_table_id = aws_route_table.private_nat_rt.id
+  subnet_id = aws_subnet.ecs_be_subnet_2.id
+}
+
+resource "aws_route_table_association" "private_3" {
+  route_table_id = aws_route_table.private_nat_rt.id
+  subnet_id = aws_subnet.ecs_fe_subnet_1.id
+}
+
+resource "aws_route_table_association" "private_4" {
+  route_table_id = aws_route_table.private_nat_rt.id
+  subnet_id = aws_subnet.ecs_fe_subnet_2.id
+}
+
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.main_vpc.id
 }
 
 resource "aws_route_table_association" "private_5" {
   route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.rds_1.id
+  subnet_id = aws_subnet.rds_subnet_1.id
 }
-
-resource "aws_route_table_association" "private_8" {
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.rds_2.id
-}
-
-resource "aws_route_table_association" "private_5" {
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.rds_1.id
-}
-
-resource "aws_route_table_association" "private_8" {
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id = aws_subnet.rds_2.id
-}
-
-#resource "aws_route_table_association" "private_6" {
-#  route_table_id = aws_route_table.private_rt.id
-#  subnet_id = aws_subnet.load_balancer_be_1.id
-#}
-#
-#resource "aws_route_table_association" "private_7" {
-#  route_table_id = aws_route_table.private_rt.id
-#  subnet_id = aws_subnet.load_balancer_be_2.id
-#}
 
 resource "aws_route_table_association" "private_6" {
-  route_table_id = aws_route_table.public_rt.id
-  subnet_id = aws_subnet.load_balancer_be_1.id
+  route_table_id = aws_route_table.private_rt.id
+  subnet_id = aws_subnet.be_elb_subnet_1.id
 }
 
 resource "aws_route_table_association" "private_7" {
-  route_table_id = aws_route_table.public_rt.id
-  subnet_id = aws_subnet.load_balancer_be_2.id
+  route_table_id = aws_route_table.private_rt.id
+  subnet_id = aws_subnet.be_elb_subnet_2.id
 }
 
-resource "aws_security_group" "alb_fe" {
+resource "aws_route_table_association" "private_8" {
+  route_table_id = aws_route_table.private_rt.id
+  subnet_id = aws_subnet.rds_subnet_2.id
+}
+
+resource "aws_security_group" "alb_fe_sg" {
   name = "turbo-alb"
   description = "Allow public internet to connect into load balancer"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   ingress {
     from_port = 80
@@ -239,11 +242,11 @@ resource "aws_security_group" "alb_fe" {
   }
 }
 
-resource "aws_security_group" "alb_be" {
+resource "aws_security_group" "alb_be_sg" {
   name = "turbo-be-alb"
   description = "Allow traffic from ecs"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   ingress {
     from_port = 80
@@ -268,17 +271,17 @@ resource "aws_security_group" "alb_be" {
   }
 }
 
-resource "aws_security_group" "private_ecs_fe" {
+resource "aws_security_group" "ecs_fe_sg" {
   name = "turbo-fe"
   description = "Allow request redirect from load balancer"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   ingress {
     from_port = var.ecs_fe_port
     to_port = var.ecs_fe_port
     protocol = "tcp"
-    security_groups = [aws_security_group.alb_fe.id]
+    security_groups = [aws_security_group.alb_fe_sg.id]
   }
   egress {
     description = "Allow all outbound traffic"
@@ -289,16 +292,16 @@ resource "aws_security_group" "private_ecs_fe" {
   }
 }
 
-resource "aws_security_group" "private_ecs_be" {
+resource "aws_security_group" "ecs_be_sg" {
   name = "turbo-be"
   description = "Allow request redirect from load balancer"
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   ingress {
     from_port = var.ecs_be_port
     to_port = var.ecs_be_port
     protocol = "tcp"
-    security_groups = [aws_security_group.alb_be.id]
+    security_groups = [aws_security_group.alb_be_sg.id]
   }
   egress {
     description = "Allow all outbound traffic"
@@ -309,17 +312,17 @@ resource "aws_security_group" "private_ecs_be" {
   }
 }
 
-resource "aws_security_group" "rds" {
+resource "aws_security_group" "rds_sg" {
   name = "turbo-rds"
   description = "Security group for RDS"
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   ingress {
     description = "Allow request from ecs backend"
     from_port = 5432
     to_port = 5432
     protocol = "tcp"
-    security_groups = [aws_security_group.private_ecs_be.id]
+    security_groups = [aws_security_group.ecs_be_sg.id]
   }
 
   egress {
@@ -328,34 +331,4 @@ resource "aws_security_group" "rds" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_security_group" "ecr_vpc_endpoint_sg" {
-  name        = "ecr-vpc-endpoint-sg"
-  description = "Security group for ECR VPC endpoint"
-
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    security_groups = [aws_security_group.private_ecs_be.id,aws_security_group.private_ecs_fe.id]
-  }
-  # Add more rules as needed...
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_eip" "nat" {
-  domain = "vpc"
-}
-
-resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.nat.id
 }
