@@ -1,17 +1,17 @@
 resource "aws_ecs_cluster" "be_ecs_cluster" {
-  name = "turbo-be"
+  name = "turbo-be-${terraform.workspace}"
   setting {
     name = "containerInsights"
     value = "enabled"
   }
 
   tags = {
-    Name = "turbo-be"
+    Name = "turbo-be-${terraform.workspace}"
   }
 }
 
 resource "aws_ecs_task_definition" "be_ecs_task_def" {
-  family = "turbo-be"
+  family = "turbo-be-${terraform.workspace}"
   container_definitions = <<TASK_DEFINITION
   [
   {
@@ -44,7 +44,7 @@ resource "aws_ecs_task_definition" "be_ecs_task_def" {
     "memory": 1024,
     "image": "${var.image_url}",
     "essential": true,
-    "name": "turbo-be"
+    "name": "turbo-be-${terraform.workspace}"
   }
 ]
 TASK_DEFINITION
@@ -57,12 +57,12 @@ TASK_DEFINITION
   task_role_arn = var.ecs_role_name
 
   tags = {
-    Name = "turbo-be"
+    Name = "turbo-be-${terraform.workspace}"
   }
 }
 
 resource "aws_ecs_service" "be_ecs_service" {
-  name = "turbo-be"
+  name = "turbo-be-${terraform.workspace}"
   cluster = aws_ecs_cluster.be_ecs_cluster.id
   task_definition = aws_ecs_task_definition.be_ecs_task_def.arn
   desired_count = 1
@@ -81,7 +81,7 @@ resource "aws_ecs_service" "be_ecs_service" {
 
   load_balancer {
     target_group_arn = var.ecs_target_group
-    container_name = "turbo-be"
+    container_name = "turbo-be-${terraform.workspace}"
     container_port = var.container_port
   }
 }

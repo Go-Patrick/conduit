@@ -5,7 +5,7 @@ resource "aws_vpc" "main_vpc" {
   enable_dns_support = "true"
 
   tags = {
-    "Name" = "turbo-vpc"
+    "Name" = "turbo-vpc-${terraform.workspace}"
   }
 }
 
@@ -13,7 +13,7 @@ resource "aws_internet_gateway" "internet_gw" {
   vpc_id = aws_vpc.main_vpc.id
 
   tags = {
-    "Name" = "demo1-gw"
+    "Name" = "demo1-gw-${terraform.workspace}"
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_subnet" "fe_alb_subnet_2" {
   cidr_block = var.vpc_public_cidr_block[1]
 
   tags = {
-    Name="load-balancer-fe-2"
+    Name="load-balancer-fe-2-${terraform.workspace}"
   }
 }
 
@@ -43,7 +43,7 @@ resource "aws_subnet" "nat_subnet" {
   cidr_block = var.vpc_public_cidr_block[2]
 
   tags = {
-    Name="nat"
+    Name="nat-${terraform.workspace}"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_subnet" "be_elb_subnet_1" {
   cidr_block = var.vpc_private_cidr_block[5]
 
   tags = {
-    Name="load-balancer-be-1"
+    Name="load-balancer-be-1-${terraform.workspace}"
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_subnet" "be_elb_subnet_2" {
   cidr_block = var.vpc_private_cidr_block[6]
 
   tags = {
-    Name="load-balancer-be-2"
+    Name="load-balancer-be-2-${terraform.workspace}"
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_subnet" "ecs_be_subnet_1" {
   cidr_block = var.vpc_private_cidr_block[0]
 
   tags = {
-    Name="ecs-be-1"
+    Name="ecs-be-1-${terraform.workspace}"
   }
 }
 
@@ -83,7 +83,7 @@ resource "aws_subnet" "ecs_be_subnet_2" {
   cidr_block = var.vpc_private_cidr_block[1]
 
   tags = {
-    Name="ecs-be-2"
+    Name="ecs-be-2-${terraform.workspace}"
   }
 }
 
@@ -93,7 +93,7 @@ resource "aws_subnet" "ecs_fe_subnet_1" {
   cidr_block = var.vpc_private_cidr_block[2]
 
   tags = {
-    Name="ecs-fe-1"
+    Name="ecs-fe-1-${terraform.workspace}"
   }
 }
 
@@ -103,7 +103,7 @@ resource "aws_subnet" "ecs_fe_subnet_2" {
   cidr_block = var.vpc_private_cidr_block[3]
 
   tags = {
-    Name="ecs-fe-2"
+    Name="ecs-fe-2-${terraform.workspace}"
   }
 }
 
@@ -113,7 +113,7 @@ resource "aws_subnet" "rds_subnet_1" {
   cidr_block = var.vpc_private_cidr_block[4]
 
   tags = {
-    Name="rds-1"
+    Name="rds-1-${terraform.workspace}"
   }
 }
 
@@ -123,7 +123,7 @@ resource "aws_subnet" "rds_subnet_2" {
   cidr_block = var.vpc_private_cidr_block[7]
 
   tags = {
-    Name="rds-2"
+    Name="rds-2-${terraform.workspace}"
   }
 }
 
@@ -199,12 +199,12 @@ resource "aws_route_table_association" "private_5" {
 }
 
 resource "aws_route_table_association" "private_6" {
-  route_table_id = aws_route_table.private_rt.id
+  route_table_id = aws_route_table.public_rt.id
   subnet_id = aws_subnet.be_elb_subnet_1.id
 }
 
 resource "aws_route_table_association" "private_7" {
-  route_table_id = aws_route_table.private_rt.id
+  route_table_id = aws_route_table.public_rt.id
   subnet_id = aws_subnet.be_elb_subnet_2.id
 }
 
@@ -214,7 +214,7 @@ resource "aws_route_table_association" "private_8" {
 }
 
 resource "aws_security_group" "alb_fe_sg" {
-  name = "turbo-alb"
+  name = "turbo-alb-${terraform.workspace}"
   description = "Allow public internet to connect into load balancer"
 
   vpc_id = aws_vpc.main_vpc.id
@@ -272,7 +272,7 @@ resource "aws_security_group" "alb_be_sg" {
 }
 
 resource "aws_security_group" "ecs_fe_sg" {
-  name = "turbo-fe"
+  name = "turbo-fe-${terraform.workspace}"
   description = "Allow request redirect from load balancer"
 
   vpc_id = aws_vpc.main_vpc.id
@@ -293,7 +293,7 @@ resource "aws_security_group" "ecs_fe_sg" {
 }
 
 resource "aws_security_group" "ecs_be_sg" {
-  name = "turbo-be"
+  name = "turbo-be-${terraform.workspace}"
   description = "Allow request redirect from load balancer"
   vpc_id = aws_vpc.main_vpc.id
 
@@ -313,7 +313,7 @@ resource "aws_security_group" "ecs_be_sg" {
 }
 
 resource "aws_security_group" "rds_sg" {
-  name = "turbo-rds"
+  name = "turbo-rds-${terraform.workspace}"
   description = "Security group for RDS"
   vpc_id = aws_vpc.main_vpc.id
 

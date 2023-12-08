@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name = "db-subnets"
+  name = "db-subnets-${terraform.workspace}"
   description = "Subnet group for private database"
 
   subnet_ids = var.rds_subnet_list
@@ -12,7 +12,7 @@ resource "aws_db_instance" "postgres" {
   engine_version         = "15.2"
   instance_class         = "db.t3.micro"
   db_name = var.db_name
-  identifier = var.db_identifier
+  identifier = "${var.db_identifier}-${terraform.workspace}"
   username               = var.db_username
   password               = var.db_password
   publicly_accessible    = false

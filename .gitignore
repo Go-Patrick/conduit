@@ -40,3 +40,7 @@ yarn-error.log*
 .env*
 docker-compose-dev.yml
 .yarnrc.yml
+
+#terraform
+terraform/*.tfvars
+*.tfvars

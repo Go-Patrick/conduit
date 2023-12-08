@@ -7,7 +7,7 @@ pipeline {
         FE_IMAGE_NAME="turbo-fe"
         BE_IMAGE_NAME="turbo-be"
         ECR_URL="932782693588.dkr.ecr.ap-southeast-1.amazonaws.com"
-        BE_URL="http://turbo-be-374361277.ap-southeast-1.elb.amazonaws.com"
+        BE_URL="http://turbo-be-prod-447029978.ap-southeast-1.elb.amazonaws.com"
     }
 
     tools{
@@ -32,12 +32,12 @@ pipeline {
         // }
 
         stage('Build backend image'){
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev'
-                }
-            }
+            // when {
+            //     anyOf {
+            //         branch 'main'
+            //         branch 'dev'
+            //     }
+            // }
             steps{
                 script{
                     try{
@@ -56,12 +56,12 @@ pipeline {
         }
 
         stage('Deploy new backend version'){
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev'
-                }
-            }
+            // when {
+            //     anyOf {
+            //         branch 'main'
+            //         branch 'dev'
+            //     }
+            // }
             steps{
                 script{
                     try{
@@ -77,12 +77,12 @@ pipeline {
         }
 
         stage('Build frontend image'){
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev'
-                }
-            }
+            // when {
+            //     anyOf {
+            //         branch 'main'
+            //         branch 'dev'
+            //     }
+            // }
             steps{
                 script{
                     try{
@@ -101,12 +101,12 @@ pipeline {
         }
 
         stage('Deploy new frontend version'){
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev'
-                }
-            }
+            // when {
+            //     anyOf {
+            //         branch 'main'
+            //         branch 'dev'
+            //     }
+            // }
             steps{
                 script{
                     try{

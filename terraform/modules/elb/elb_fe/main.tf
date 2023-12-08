@@ -1,17 +1,17 @@
 resource "aws_lb" "elb" {
-  name               = "turbo"
+  name               = "turbo-${terraform.workspace}"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.load_balancer_sg]
   subnets            = var.load_balancer_subnet_list
 
   tags = {
-    Name = "turbo"
+    Name = "turbo-${terraform.workspace}"
   }
 }
 
 resource "aws_lb_target_group" "ecs_fe" {
-  name     = "ecs"
+  name     = "ecs-${terraform.workspace}"
   port     = var.ecs_port
   protocol = "HTTP"
   vpc_id   = var.vpc
@@ -28,7 +28,7 @@ resource "aws_lb_target_group" "ecs_fe" {
   }
 
   tags = {
-    Name = "turbo"
+    Name = "turbo-${terraform.workspace}"
   }
 }
 

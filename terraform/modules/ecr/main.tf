@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "api_ecr" {
-  name = var.be_image_name
+  name = "${var.be_image_name}-${terraform.workspace}"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -7,7 +7,7 @@ resource "aws_ecr_repository" "api_ecr" {
 }
 
 resource "aws_ecr_repository" "fe_ecr" {
-  name = var.fe_image_name
+  name = "${var.fe_image_name}-${terraform.workspace}"
 
   image_scanning_configuration {
     scan_on_push = true
