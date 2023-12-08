@@ -66,7 +66,7 @@ pipeline {
                 script{
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
-                            sh 'aws ecs update-service --cluster turbo-be --service turbo-be --force-new-deployment'
+                            sh 'aws ecs update-service --cluster turbo-be-prod --service turbo-be-prod --force-new-deployment'
                         }
                     } catch (Exception e){
                         echo "Caught exception:  ${e}"
@@ -111,7 +111,7 @@ pipeline {
                 script{
                     try{
                         withAWS(credentialsId: "${env.AWS_CREDENTIALS_ID}") {
-                            sh 'aws ecs update-service --cluster turbo-fe --service turbo-fe --force-new-deployment'
+                            sh 'aws ecs update-service --cluster turbo-fe-prod --service turbo-fe-prod --force-new-deployment'
                         }
                     } catch (Exception e){
                         echo "Caught exception:  ${e}"
