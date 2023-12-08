@@ -26,7 +26,7 @@ pipeline {
         stage('Set Deploy Environment') {
             steps {
                 script {
-                    if (branch == 'dev') {
+                    if (env.BRANCH_NAME  == 'dev') {
                         env.DEPLOY_ENV = 'dev'
                     } else {
                         env.DEPLOY_ENV = 'prod'
