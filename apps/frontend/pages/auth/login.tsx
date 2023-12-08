@@ -102,7 +102,7 @@ export default function LoginPage() {
           variant="contained"
           sx={{ width: "90%" }}
         >
-          Login
+          Sign in
         </Button>
         <Typography
           component="a"
