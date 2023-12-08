@@ -4,7 +4,7 @@ pipeline {
     environment {
         SHORT_COMMIT="${GIT_COMMIT[0..7]}"
         AWS_CREDENTIALS_ID = "patrick-demo-1"
-        DEPLOY_ENV = branch == 'dev' ? 'dev' : 'prod'
+        DEPLOY_ENV = env.BRANCH_NAME == "dev" ? "dev" : "prod"
         FE_IMAGE_NAME="turbo-fe"
         BE_IMAGE_NAME="turbo-be"
         ECR_URL="932782693588.dkr.ecr.ap-southeast-1.amazonaws.com"
