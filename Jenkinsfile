@@ -44,12 +44,12 @@ pipeline {
         // }
 
         stage('Build backend image'){
-            // when {
-            //     anyOf {
-            //         branch 'main'
-            //         branch 'dev'
-            //     }
-            // }
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps{
                 script{
                     try{
@@ -68,12 +68,12 @@ pipeline {
         }
 
         stage('Deploy new backend version'){
-            // when {
-            //     anyOf {
-            //         branch 'main'
-            //         branch 'dev'
-            //     }
-            // }
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps{
                 script{
                     try{
@@ -89,12 +89,12 @@ pipeline {
         }
 
         stage('Build frontend image'){
-            // when {
-            //     anyOf {
-            //         branch 'main'
-            //         branch 'dev'
-            //     }
-            // }
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps{
                 script{
                     try{
@@ -113,12 +113,12 @@ pipeline {
         }
 
         stage('Deploy new frontend version'){
-            // when {
-            //     anyOf {
-            //         branch 'main'
-            //         branch 'dev'
-            //     }
-            // }
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps{
                 script{
                     try{
